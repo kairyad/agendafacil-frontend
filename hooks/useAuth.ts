@@ -9,6 +9,7 @@ interface User {
     email: string
     username: string
     avatar?: string
+    apiToken?: string
 }
 
 interface AuthState {

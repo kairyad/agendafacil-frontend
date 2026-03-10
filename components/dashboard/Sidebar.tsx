@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Calendar, Clock, Home, Settings, Users, X, Crown } from 'lucide-react'
+import { Calendar, Clock, Home, Settings, Users, X, Crown, Code2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -12,6 +12,7 @@ const navigation = [
     { name: 'Agendamento', href: '/agendamento', icon: Calendar },
     { name: 'Reuniões', href: '/reunioes', icon: Users },
     { name: 'Disponibilidade', href: '/disponibilidade', icon: Clock },
+    { name: 'Integrações', href: '/integracoes', icon: Code2 },
     { name: 'Configurações', href: '/configuracoes', icon: Settings },
 ]
 

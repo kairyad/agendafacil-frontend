@@ -93,8 +93,30 @@ export default function BookingPage(props: { params: Promise<{ username: string,
         }
     }
 
+    const handleAddToGoogle = () => {
+        if (!confirmedAppt) return
+        const appointmentDate = new Date(confirmedAppt.startTime || confirmedAppt.start_time)
+        const appointmentEnd = new Date(confirmedAppt.endTime || confirmedAppt.end_time)
+        const start = appointmentDate.toISOString().replace(/-|:|\.\d\d\d/g, "")
+        const end = appointmentEnd.toISOString().replace(/-|:|\.\d\d\d/g, "")
+        const title = encodeURIComponent(confirmedAppt.title || 'Agendamento')
+        const details = encodeURIComponent('Gerado via Agenda Fácil')
+        const location = encodeURIComponent(confirmedAppt.meetLink || confirmedAppt.meet_link || 'Vídeoconferência')
+
+        window.open(`https://calendar.google.com/calendar/r/eventedit?dates=${start}/${end}&text=${title}&details=${details}&location=${location}`, '_blank')
+    }
+
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col pt-12">
+        <div className="min-h-screen bg-gray-50 flex flex-col pt-8">
+            <div className="container mx-auto px-4 mb-6">
+                <div className="max-w-5xl mx-auto flex items-center justify-center sm:justify-start gap-2 text-blue-600">
+                    <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shadow-md">
+                        <CalendarIcon className="w-5 h-5 text-white" />
+                    </div>
+                    <span className="text-xl font-bold tracking-tight text-slate-800">Agenda Fácil</span>
+                </div>
+            </div>
+
             <div className="container mx-auto px-4 flex-1">
                 <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 flex flex-col md:flex-row min-h-[600px]">
 
@@ -139,10 +161,60 @@ export default function BookingPage(props: { params: Promise<{ username: string,
                         )}
                     </div>
 
-                    {/* Coluna Direita: Calendário / Form */}
-                    <div className="w-full md:w-7/12 p-8 lg:p-12 relative bg-white">
+                    {/* Coluna Direita: Calendário / Form / Success */}
+                    <div className="w-full md:w-7/12 p-8 lg:p-12 relative bg-white flex flex-col">
 
-                        {!selectedDate ? (
+                        {confirmedAppt ? (
+                            <div className="h-full flex flex-col items-center justify-center animate-in slide-in-from-bottom-4 duration-500 fade-in text-center max-w-sm mx-auto">
+                                <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-6 border-4 border-green-100">
+                                    <svg className="w-10 h-10 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <h2 className="text-3xl font-bold text-gray-900 mb-2">Está Confirmado!</h2>
+                                <p className="text-gray-500 mb-8">
+                                    Você tem um agendamento com <span className="font-semibold text-gray-700">{eventType?.user?.name}</span>. Enviamos um convite para o seu e-mail.
+                                </p>
+
+                                <div className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-6 text-left mb-8 space-y-4 shadow-sm">
+                                    <div className="flex items-start gap-4">
+                                        <div className="mt-1 bg-white p-2 rounded-lg shadow-sm border border-gray-100">
+                                            <CalendarIcon className="w-5 h-5 text-blue-600" />
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold text-gray-900 text-lg">
+                                                {format(new Date(confirmedAppt.startTime || confirmedAppt.start_time), "EEEE, d 'de' MMMM", { locale: ptBR })}
+                                            </p>
+                                            <p className="text-gray-500 font-medium mt-0.5">
+                                                {format(new Date(confirmedAppt.startTime || confirmedAppt.start_time), "HH:mm")} - {format(new Date(confirmedAppt.endTime || confirmedAppt.end_time), "HH:mm")}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    {(confirmedAppt.meetLink || confirmedAppt.meet_link) && (
+                                        <div className="flex items-start gap-4 pt-4 border-t border-gray-200/60">
+                                            <div className="mt-1 bg-white p-2 rounded-lg shadow-sm border border-gray-100">
+                                                <Video className="w-5 h-5 text-blue-600" />
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="font-semibold text-gray-900">Videoconferência</p>
+                                                <a href={confirmedAppt.meetLink || confirmedAppt.meet_link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 hover:underline text-sm font-medium mt-0.5 block truncate">
+                                                    Entrar no Google Meet
+                                                </a>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <Button
+                                    onClick={handleAddToGoogle}
+                                    variant="outline"
+                                    className="w-full py-6 font-semibold border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-all rounded-xl shadow-sm"
+                                >
+                                    <svg viewBox="0 0 24 24" className="w-5 h-5 mr-3" fill="currentColor"><path d="M21.35 11.1h-9.17v2.73h6.51c-.33 3.81-3.5 5.44-6.5 5.44C8.36 19.27 5 16.25 5 12c0-4.1 3.2-7.27 7.2-7.27 3.09 0 4.9 1.97 4.9 1.97L19 4.72S16.56 2 12.1 2C6.42 2 2.03 6.8 2.03 12c0 5.05 4.13 10 10.22 10 5.35 0 9.25-3.67 9.25-9.09 0-1.15-.15-1.81-.15-1.81Z" /></svg>
+                                    Adicionar à sua Agenda
+                                </Button>
+                            </div>
+                        ) : !selectedDate ? (
                             <div className="h-full flex flex-col">
                                 <h2 className="text-xl font-bold text-gray-900 mb-6">Selecione uma data e horário</h2>
                                 <div className="flex justify-center flex-1 bg-white">
@@ -235,15 +307,9 @@ export default function BookingPage(props: { params: Promise<{ username: string,
                 </div>
             </div>
 
-            <div className="text-center py-6 text-sm text-gray-400 mt-8">
+            <div className="text-center py-6 text-sm text-gray-400 mt-8 shrink-0">
                 Powered by <span className="font-bold text-gray-500">Agenda Fácil</span>
             </div>
-
-            <ConfirmationModal
-                isOpen={!!confirmedAppt}
-                onClose={() => setConfirmedAppt(null)}
-                appointment={confirmedAppt}
-            />
         </div>
     )
 }
