@@ -14,11 +14,23 @@ export default function IntegracoesPage() {
     const [generating, setGenerating] = useState(false)
     const [apiToken, setApiToken] = useState<string | null>(null)
     const [copiedContent, setCopiedContent] = useState<string | null>(null)
+    const [eventSlug, setEventSlug] = useState<string>('slug-do-seu-evento')
 
     useEffect(() => {
         if (!authLoading && user) {
-            // API Token is returned in the getMe payload if it exists
             setApiToken(user.apiToken || null)
+
+            // Buscar o slug real de um evento do usuário para o template do cURL
+            api.get('/api/event-types')
+                .then(res => {
+                    const eventosAtivos = res.data.data.filter((e: any) => e.is_active)
+                    if (eventosAtivos.length > 0) {
+                        setEventSlug(eventosAtivos[0].slug)
+                    }
+                })
+                .catch(console.error)
+                .finally(() => setLoading(false))
+        } else if (!authLoading && !user) {
             setLoading(false)
         }
     }, [user, authLoading])
@@ -55,7 +67,6 @@ export default function IntegracoesPage() {
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://agendafacil-production-82b6.up.railway.app'
     const username = user?.username || 'seu_username'
-    const eventSlug = 'nome_do_evento' // Example
 
     const curlSlots = `curl -X GET "${apiUrl}/api/public/${username}/${eventSlug}/available-slots?date=2026-03-15" \\
   -H "Authorization: Bearer \${API_TOKEN}"`
