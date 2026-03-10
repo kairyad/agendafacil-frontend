@@ -15,6 +15,7 @@ export default function ReunioesPage() {
     const [filter, setFilter] = useState('all')
     const [cancelModal, setCancelModal] = useState<string | null>(null)
     const [cancelReason, setCancelReason] = useState('')
+    const [isCanceling, setIsCanceling] = useState(false)
 
     const fetchAppointments = async () => {
         try {
@@ -33,13 +34,16 @@ export default function ReunioesPage() {
     const handleCancel = async () => {
         if (!cancelModal) return
         try {
+            setIsCanceling(true)
             await api.post(`/api/appointments/${cancelModal}/cancel`, { reason: cancelReason })
             toast.success('Reunião cancelada e email enviado!')
-            setCancelModal(null)
-            setCancelReason('')
             fetchAppointments()
         } catch (e) {
             toast.error('Ocorreu um erro ao cancelar')
+        } finally {
+            setIsCanceling(false)
+            setCancelModal(null)
+            setCancelReason('')
         }
     }
 
@@ -72,8 +76,8 @@ export default function ReunioesPage() {
                 {filters.map(f => (
                     <button key={f.key} onClick={() => setFilter(f.key)}
                         className={`px-4 py-2 text-[13px] font-medium rounded-md transition-colors duration-150 ${filter === f.key
-                                ? 'bg-[#1C2333] text-slate-50 border border-white/[0.12]'
-                                : 'text-slate-600 hover:text-slate-400 hover:bg-white/[0.03] border border-transparent'
+                            ? 'bg-[#1C2333] text-slate-50 border border-white/[0.12]'
+                            : 'text-slate-600 hover:text-slate-400 hover:bg-white/[0.03] border border-transparent'
                             }`}>
                         {f.label}
                     </button>
@@ -153,8 +157,10 @@ export default function ReunioesPage() {
                             </div>
                         </div>
                         <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-white/[0.06]">
-                            <Button variant="ghost" onClick={() => setCancelModal(null)} className="text-[13px] text-slate-600 hover:text-slate-200 hover:bg-white/[0.03]">Voltar</Button>
-                            <Button onClick={handleCancel} className="bg-red-500 hover:bg-red-600 text-white text-[13px]">Confirmar</Button>
+                            <Button variant="ghost" onClick={() => setCancelModal(null)} disabled={isCanceling} className="text-[13px] text-slate-600 hover:text-slate-200 hover:bg-white/[0.03]">Voltar</Button>
+                            <Button onClick={handleCancel} disabled={isCanceling} className="bg-red-500 hover:bg-red-600 text-white text-[13px]">
+                                {isCanceling ? 'Cancelando...' : 'Confirmar'}
+                            </Button>
                         </div>
                     </div>
                 </div>
