@@ -78,7 +78,8 @@ export default function IntegracoesPage() {
     "startTime": "2026-03-15T14:00:00.000Z",
     "attendeeName": "João Silva",
     "attendeeEmail": "joao@email.com",
-    "attendeeNotes": "Preciso falar sobre o projeto X."
+    "attendeeNotes": "Preciso falar sobre o projeto X.",
+    "generateMeetLink": true
   }'`
 
     const curlCancel = `# (Se precisar cancelar em endpoints futuros, a lógica de auth é exatamente a mesma!)
