@@ -73,7 +73,7 @@ export default function IntegracoesPage() {
     const curlSlots = `curl -X GET "${apiUrl}/api/public/${username}/${eventSlug}/available-slots?date=2026-03-15" \\
   -H "Authorization: Bearer \${API_TOKEN}"`
 
-    const curlBook = `curl -X POST "${origin}/api/public/${username}/${eventSlug}/book" \\
+    const curlBook = `curl -X POST "${apiUrl}/api/public/${username}/${eventSlug}/book" \\
   -H "Authorization: Bearer \${API_TOKEN}" \\
   -H "Content-Type: application/json" \\
   -d '{
