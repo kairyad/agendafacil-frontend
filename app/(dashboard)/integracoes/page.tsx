@@ -67,15 +67,17 @@ export default function IntegracoesPage() {
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://agendafacil-production-82b6.up.railway.app'
     const username = user?.username || 'seu_username'
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://agendafacil-production-82b6.up.railway.app';
+
 
     const curlSlots = `curl -X GET "${apiUrl}/api/public/${username}/${eventSlug}/available-slots?date=2026-03-15" \\
   -H "Authorization: Bearer \${API_TOKEN}"`
 
-    const curlBook = `curl -X POST "${apiUrl}/api/public/${username}/${eventSlug}/book" \\
+    const curlBook = `curl -X POST "${origin}/api/public/${user?.username || 'sasa'}/${user?.event_types?.[0]?.slug || 'slug-do-seu-evento'}/book" \\
   -H "Authorization: Bearer \${API_TOKEN}" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "startTime": "2026-03-15T14:00:00.000Z",
+    "startTime": "2026-03-15T14:00:00.000-03:00",
     "attendeeName": "João Silva",
     "attendeeEmail": "joao@email.com",
     "attendeeNotes": "Preciso falar sobre o projeto X.",
